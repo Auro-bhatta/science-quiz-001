@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .quiz-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 600px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .quiz-container:hover {
+            transform: scale(1.02);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .options li {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border-radius: 5px;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .options li:hover {
+            background-color: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+
+        .options li.correct {
+            background-color: rgba(144, 238, 144, 0.8);
+            color: #000;
+        }
+
+        .options li.incorrect {
+            background-color: rgba(240, 128, 128, 0.8);
+            color: #000;
+        }
+
+        button {
+            background: linear-gradient(to right, #2193b0, #6dd5ed);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #6dd5ed, #2193b0);
+            transform: translateY(-2px);
+        }
+
+        #result {
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .question {
+                font-size: 1rem;
+            }
+
+            .options li {
+                padding: 0.6rem;
+                margin: 0.4rem 0;
+            }
+
+            button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            #result {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Science Quiz</h1>
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button onclick="nextQuestion()">Next Question</button>
+        </div>
+        <div id="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the acceleration due to gravity on Earth?",
+                options: ["9.8 m/s²", "10 m/s²", "11 m/s²", "9 m/s²"],
+                correctAnswer: "9.8 m/s²"
+            },
+            {
+                question: "What is the formula for calculating speed?",
+                options: ["Distance x Time", "Distance / Time", "Time / Distance", "Distance + Time"],
+                correctAnswer: "Distance / Time"
+            },
+            {
+                question: "Which of the following is a form of energy?",
+                options: ["Force", "Mass", "Velocity", "Potential"],
+                correctAnswer: "Potential"
+            },
+            {
+                question: "What is the unit of force?",
+                options: ["Watt", "Joule", "Newton", "Pascal"],
+                correctAnswer: "Newton"
+            },
+            {
+                question: "Newton's first law of motion is also known as the law of:",
+                options: ["Acceleration", "Inertia", "Reaction", "Gravity"],
+                correctAnswer: "Inertia"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let quizDiv = document.getElementById("quiz");
+        let resultDiv = document.getElementById("result");
+        let questionDiv = document.getElementById("question");
+        let optionsList = document.getElementById("options");
+
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionDiv.textContent = question.question;
+            optionsList.innerHTML = "";
+
+            question.options.forEach(option => {
+                const li = document.createElement("li");
+                li.textContent = option;
+                li.addEventListener("click", () => checkAnswer(option));
+                optionsList.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selectedOption) {
+            const correctAnswer = questions[currentQuestionIndex].correctAnswer;
+            const options = document.querySelectorAll("#options li");
+
+            options.forEach(option => {
+                if (option.textContent === correctAnswer) {
+                    option.classList.add("correct");
+                } else if (option.textContent === selectedOption) {
+                    option.classList.add("incorrect");
+                }
+                option.onclick = null;
+            });
+
+            if (selectedOption === correctAnswer) {
+                score++;
+            }
+
+            disableOptions();
+        }
+
+        function disableOptions() {
+            const options = document.querySelectorAll("#options li");
+            options.forEach(option => {
+                option.style.pointerEvents = "none";
+            });
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+                resetOptionStyles();
+            } else {
+                showResult();
+            }
+        }
+
+        function resetOptionStyles() {
+            const options = document.querySelectorAll("#options li");
+            options.forEach(option => {
+                option.classList.remove("correct", "incorrect");
+                option.style.pointerEvents = "auto";
+            });
+        }
+
+        function showResult() {
+            quizDiv.style.display = "none";
+            resultDiv.style.display = "block";
+            resultDiv.textContent = `You scored ${score} out of ${questions.length}!`;
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
